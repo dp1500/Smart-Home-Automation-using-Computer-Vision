@@ -186,8 +186,9 @@ def detect_fire(img):
     fire_boxes = []
 
     for r in results:
-        if r.boxes.id != None:  # This will ensure that id is not None
-            print(r.boxes.id.cpu().numpy().astype(int))
+        if r.boxes.conf is not None:  # This will ensure that id is not None
+            # print(r.boxes.id.cpu().numpy().astype(int))
+            print(" level 1 id change")
 
         boxes = r.boxes
         for box in boxes:
@@ -231,8 +232,9 @@ while True:
     results = model(img, stream=True)
     for r in results:
 
-        if r.boxes.id!=None: # this will ensure that id is not None
-            print(r.boxes.id.cpu().numpy().astype(int)) 
+        if r.boxes.conf is not None: # this will ensure that id is not None
+            # print(r.boxes.id.cpu().numpy().astype(int)) 
+            print("level 2 id change")
 
         boxes = r.boxes
         for box in boxes:
@@ -242,7 +244,7 @@ while True:
 
             conf = math.ceil((box.conf[0] * 100)) / 100
             cls = int(box.cls[0])
-
+ 
             if cls != 0:
                 break
 
