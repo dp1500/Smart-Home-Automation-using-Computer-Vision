@@ -19,6 +19,8 @@ import face_recognition
 
 from app import *
 
+# import app
+
 flask_thread = threading.Thread(target=run_flask)
 flask_thread.start()
  
@@ -290,6 +292,8 @@ while True:
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+
 
 cap.release()
 cv2.destroyAllWindows()
