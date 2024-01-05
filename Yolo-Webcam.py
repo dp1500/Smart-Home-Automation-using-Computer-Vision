@@ -36,8 +36,10 @@ api_call_interval = 1.0  # Set the desired interval in seconds
 # Define the width of the room (adjust according to your room dimensions)
 room_width = 1280
  
-cap = cv2.VideoCapture(0)  # For Webcam
-cap.set(3, 1280)
+# cap = cv2.VideoCapture(0)  # For Webcam
+# cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid1.mp4") # For Video
+cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid2.mp4") # For shorter Video
+cap.set(3, 1280) 
 cap.set(4, 720)
  
 model = YOLO("../Yolo-Weights/yolov8l.pt")
@@ -81,15 +83,32 @@ def send_position_to_flask_server_async(position):
 # ///////////////////////  Image detection and recoginition setup ///////////
 
 # Load a sample image of the family members (replace with your own images)
-family_member_image_paths = [r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\family_images\devansh.jpg"]
+family_member_image_paths = [r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\family_images\devansh.jpg", r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\family_images\nitin.jpg"]
 known_face_encodings = [face_recognition.face_encodings(face_recognition.load_image_file(img_path))[0] for img_path in family_member_image_paths]
 
 
 # Function to send position information to the Flask server in a separate thread
+# def unknown_detected_api_call(status):
+#     with api_lock:
+#         url = f"{flask_server_endpoint}/update_unknown_face"
+#         payload = {"status": status}
+#         response = requests.post(url, json=payload)
+#         print("API Response:", response.text)
+
+# Function to send intruder detection status with notification
 def unknown_detected_api_call(status):
     with api_lock:
         url = f"{flask_server_endpoint}/update_unknown_face"
-        payload = {"status": status}
+        
+        # Include additional data for notification in the payload
+        payload = {
+            "status": status,
+            "notification_data": {
+                'title': 'Intruder Detected!',
+                'body': 'Possible intruder detected. Open the app to view details.',
+            }
+        }
+        
         response = requests.post(url, json=payload)
         print("API Response:", response.text)
 
@@ -120,11 +139,11 @@ def recognize_face(frame):
             cropped_face = frame[top:bottom, left:right]
 
             # Save the extracted face to the /static/faces/ directory
-            face_filename = f"{static_faces_directory}/detected_face_{time.time()}.jpg"
+            face_filename = f"{static_faces_directory}/known_face_{time.time()}.jpg"
             cv2.imwrite(face_filename, cropped_face)
 
             # Save the whole frame (with the bounding box) to the /static/images/ directory
-            image_filename = f"{static_images_directory}/detected_image_{time.time()}.jpg"
+            image_filename = f"{static_images_directory}/known_face_detected_image_{time.time()}.jpg" 
             cv2.imwrite(image_filename, frame)
             
         else:
@@ -139,11 +158,11 @@ def recognize_face(frame):
             cropped_face = frame[top:bottom, left:right]
 
             # Save the extracted face to the /static/faces/ directory
-            face_filename = f"{static_faces_directory}/detected_face_{time.time()}.jpg"
+            face_filename = f"{static_faces_directory}/unknown_face_detected{time.time()}.jpg"
             cv2.imwrite(face_filename, cropped_face)
 
             # Save the whole frame (with the bounding box) to the /static/images/ directory
-            image_filename = f"{static_images_directory}/detected_image_{time.time()}.jpg"
+            image_filename = f"{static_images_directory}/unknown_face_detected{time.time()}.jpg"
             cv2.imwrite(image_filename, frame)
 
             # Display the cropped face

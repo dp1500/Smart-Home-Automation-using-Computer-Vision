@@ -1,9 +1,48 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, jsonify
 from threading import Thread
 import threading
 import cv2
 
+
+import firebase_admin
+from firebase_admin import credentials, messaging
+
 app = Flask(__name__)
+
+# Initialize Firebase Admin SDK with your credentials
+cred = credentials.Certificate("smart_home_automation_2\home-automation-f4916-firebase-adminsdk-eu45p-bf29f14315.json")
+firebase_admin.initialize_app(cred)
+
+
+def send_notification(title, body):
+    try:
+        
+        
+        
+        push_message = messaging.Message(
+            data={
+                'title': title,
+                'body': body,
+            },
+            topic="notify",  # You can use a topic or specify the `token` directly
+            # token = "ehb54P3WSGKyOaV-EfWXkX:APA91bFKQhBLsEmQ0iIRRpT__bz47yXXUBXcpti6u1rWeHAAud-bnqLdJSM4VssrnEtiMC-OpMguLsraac2JD7dSpPpmBSCspLjJ9JIbgXCgzOyI1TPaoVSeWdRQqhk7A4ZgDlfnrO1A"
+        )
+
+        print(push_message)
+
+        # Send the message
+        response = messaging.send(push_message)
+        print(response)
+
+        # Return a standard Python dictionary instead of using jsonify
+        return {"success": True, "response": response}
+    
+    except Exception as e:
+        # Return a standard Python dictionary instead of using jsonify
+        return {"success": False, "error": str(e)}
+
+send_noti = send_notification("Intruder Detected!", "Possible intruder detected. Open the app to view details")
+print(send_noti)
 
 # Shared variable among different parts of your application
 last_detected_position = "unknown" # updated every 80-100 ms
@@ -51,6 +90,7 @@ def update_position_async(position):
 global unknown_face_detected
 unknown_face_detected = None
 
+
 @app.route('/update_unknown_face', methods=['POST'])
 def update_unknown_face():
     global unknown_face_detected
@@ -58,11 +98,38 @@ def update_unknown_face():
     # Get the value from the request
     data = request.get_json()
 
-    unknown_face_detected = data.get('status')
+    unknown_face_detected = data.get('unknown_face_detected', False)
 
-    print( "post api call check ", unknown_face_detected)
+    # Check if notification data is included
+    notification_data = data.get('notification_data')
+    if notification_data:
+        # Extract notification details and send the notification
+        title = notification_data.get('title')
+        body = notification_data.get('body')
+        # image_path = notification_data.get('image_path')
+        
+        # Call the function to send the notification
+        send_notification(title, body)
 
-    return {"message": "unknown status updated succesfully", "unknown_face_detected": unknown_face_detected}
+    return {"message": "unknown status updated successfully", "unknown_face_detected": unknown_face_detected}
+
+# def update_unknown_face():
+#     global unknown_face_detected
+
+#     # Get the value from the request
+#     data = request.get_json()
+
+#     unknown_face_detected = data.get('status')
+
+#     print( "post api call check ", unknown_face_detected)
+
+#     return {"message": "unknown status updated succesfully", "unknown_face_detected": unknown_face_detected}
+
+
+
+
+
+
 
 @app.route('/get_unknown_face_status', methods=['GET'])
 def get_unknown_face_status():
@@ -110,7 +177,7 @@ def get_fire_status():
 
 #////////////// video feed live code ////////////
 
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(0) 
 
 def generate_frames():
     while True:
