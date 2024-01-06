@@ -38,7 +38,7 @@ room_width = 1280
  
 # cap = cv2.VideoCapture(0)  # For Webcam
 # cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid1.mp4") # For Video
-cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid2.mp4") # For shorter Video
+cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid3.mp4") # For shorter Video
 cap.set(3, 1280) 
 cap.set(4, 720)
  
@@ -95,27 +95,42 @@ known_face_encodings = [face_recognition.face_encodings(face_recognition.load_im
 #         response = requests.post(url, json=payload)
 #         print("API Response:", response.text)
 
+import datetime 
 # Function to send intruder detection status with notification
-def unknown_detected_api_call(status):
-    with api_lock:
-        url = f"{flask_server_endpoint}/update_unknown_face"
-        
-        # Include additional data for notification in the payload
-        payload = {
-            "status": status,
-            "notification_data": {
-                'title': 'Intruder Detected!',
-                'body': 'Possible intruder detected. Open the app to view details.',
+def unknown_detected_api_call(status, image_filename=None):
+    print("levelllll  ahahahahhahaahahahhahahahhahhahahahahahhahahahahhahahahhahahahhahahhah")
+    if status:
+        with api_lock:
+            url = f"{flask_server_endpoint}/update_unknown_face"
+
+            # Include additional data for notification in the payload
+            timestamp = datetime.datetime.utcnow().isoformat()
+
+            intruder_data = {
+                "timestamp": timestamp,
+                "image_name": image_filename,
             }
-        }
-        
-        response = requests.post(url, json=payload)
-        print("API Response:", response.text)
+
+            payload = {
+                "Alert_type": "intruder",
+                "status": "true",
+                "intruder_data": intruder_data,
+                "notification_data": {
+                    'title': 'Intruder Detected!',
+                    'body': 'Possible intruder detected. Open the app to view details.',
+                }
+            }
+
+            response = requests.post(url, json=payload)
+            print("API Response:", response.text)
+
+
 
 
 # # Directory paths for saving the images
 static_images_directory = r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\images"
 static_faces_directory = r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\faces"
+static_unknown_faces_directory = r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\unknown_faces"
 
 
 def recognize_face(frame):
@@ -130,7 +145,7 @@ def recognize_face(frame):
         if True in matches:
             # Face matched with a family member
             print("Face recognized as a family member!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            threading.Thread(target=unknown_detected_api_call, args=(False,)).start()
+            # threading.Thread(target=unknown_detected_api_call, args=(False,)).start()
             # Add your alert logic here
                         # Draw a bounding box around the detected face
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
@@ -145,25 +160,46 @@ def recognize_face(frame):
             # Save the whole frame (with the bounding box) to the /static/images/ directory
             image_filename = f"{static_images_directory}/known_face_detected_image_{time.time()}.jpg" 
             cv2.imwrite(image_filename, frame)
+            # threading.Thread(target=unknown_detected_api_call, args=(False,image_filename)).start()
             
         else:
             # Face did not match with any family member
             print("Unknown face detected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            threading.Thread(target=unknown_detected_api_call, args=(True,)).start()
+            # threading.Thread(target=unknown_detected_api_call, args=(True,)).start()
+            # threading.Thread(target=unknown_detected_api_call, args=(image_filename,)).start()
 
-            # Draw a bounding box around the detected face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+            # # Draw a bounding box around the detected face
+            # cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+
+            # Increase the size of the bounding box by a certain factor (e.g., 20%)
+            expand_factor = 0.2  # You can adjust this factor based on your requirements
+            expanded_left = max(0, int(left - expand_factor * (right - left)))
+            expanded_top = max(0, int(top - expand_factor * (bottom - top)))
+            expanded_right = min(frame.shape[1], int(right + expand_factor * (right - left)))
+            expanded_bottom = min(frame.shape[0], int(bottom + expand_factor * (bottom - top)))
+
+            # Draw the rectangle with the expanded bounding box
+            cv2.rectangle(frame, (expanded_left, expanded_top), (expanded_right, expanded_bottom), (0, 0, 255), 2)
+
 
             # Extract the cropped image of the face
             cropped_face = frame[top:bottom, left:right]
 
             # Save the extracted face to the /static/faces/ directory
-            face_filename = f"{static_faces_directory}/unknown_face_detected{time.time()}.jpg"
+            face_filename = f"{static_unknown_faces_directory}/unknown_face_detected_only_face{time.time()}.jpg"
             cv2.imwrite(face_filename, cropped_face)
 
+            current_time = time.time()
             # Save the whole frame (with the bounding box) to the /static/images/ directory
-            image_filename = f"{static_images_directory}/unknown_face_detected{time.time()}.jpg"
+            image_filename = f"{static_unknown_faces_directory}/unknown_face_detected_scene_image{current_time}.jpg" #complete picture of the scene
+            image_name = f"unknown_face_detected_scene_image{current_time}.jpg"
+            # print("unknown_detected_api_call ka callllllllll")
             cv2.imwrite(image_filename, frame)
+
+            # Call the function with both status and image_filename
+            threading.Thread(target=unknown_detected_api_call, args=(True, image_name)).start()
+
+            
 
             # Display the cropped face
             # cv2.imshow("Detected Face", cropped_face)
