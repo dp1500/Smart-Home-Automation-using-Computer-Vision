@@ -197,6 +197,13 @@ def image(image_name):
     # Use send_from_directory to serve the image
     return send_from_directory(unknown_faces_directory, image_name)
 
+
+@app.route('/get_all_intruders', methods=['GET'])
+def get_all_intruders():
+
+    global intruder_list
+    # latest_intruder = intruder_list.pop()
+    return {"all_intruder_data": intruder_list}
     
 
 # def update_unknown_face():
@@ -239,19 +246,74 @@ def get_unknown_face_status():
 # Variable to store whether fire is detected 
 fire_detected_status = None
 fire_lock = threading.Lock()
+global fire_detection_list
+fire_detection_list = []
 
 @app.route('/update_fire_status', methods=['POST'])
 def update_fire_status():
     global fire_detected_status
+    global fire_detection_list
 
     # Get the value from the request
+    # data = request.get_json()
+
+    # # Update fire detection status
+    # with fire_lock:
+    #     fire_detected_status = data.get('status')
+
+        # Get the value from the request
     data = request.get_json()
 
-    # Update fire detection status
-    with fire_lock:
-        fire_detected_status = data.get('status')
+    print("update_fire_status API called")
+    print(data)
+
+    fire_data = data.get('fire_data')
+    # timestamp = data.get('timestamp') 
+
+    fire_detection_list.append(fire_data)
+
+
+    fire_detected_status = data.get('status', False)
+
+    # Check if notification data is included
+    notification_data = data.get('notification_data')
+    if notification_data:
+        # Extract notification details and send the notification
+        title = notification_data.get('title')
+        body = notification_data.get('body')
+        # image_path = notification_data.get('image_path')
+        
+        # Call the function to send the notification
+        send_notification(title, body)
+
+        print("fire notification")
+
+    # return {"message": "unknown status updated successfully", "unknown_face_detected": unknown_face_detected}
 
     return {"message": "Fire status updated successfully", "fire_detected_status": fire_detected_status}
+
+@app.route('/get_latest_fire', methods=['GET'])
+def get_latest_fire():
+
+    global fire_detection_list
+    latest_fire = fire_detection_list.pop()
+    return {"latest_fire_data": latest_fire}
+
+from flask import send_from_directory
+
+@app.route('/fire_image/<image_name>', methods=['GET'])
+def fire_image(image_name):
+    fire_images_directory = r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\fire"
+
+    # Use send_from_directory to serve the image
+    return send_from_directory(fire_images_directory, image_name)
+
+@app.route('/get_all_fires', methods=['GET'])
+def get_all_fires():
+
+    global fire_detection_list
+    # latest_fire = fire_detection_list.pop()
+    return {"all_fires_data": fire_detection_list}
 
 @app.route('/get_fire_status', methods=['GET'])
 def get_fire_status():

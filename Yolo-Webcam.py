@@ -38,7 +38,13 @@ room_width = 1280
  
 # cap = cv2.VideoCapture(0)  # For Webcam
 # cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid1.mp4") # For Video
-cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid3.mp4") # For shorter Video
+cap = cv2.VideoCapture("smart_home_automation_2\classroom_vid4.mp4") # For shorter Video
+
+# for phone camera stream:
+
+# vid_stream_URL = 'http://192.168.1.46:4747/video'
+# cap = cv2.VideoCapture(vid_stream_URL)  
+
 cap.set(3, 1280) 
 cap.set(4, 720)
  
@@ -222,12 +228,37 @@ fire_model = YOLO("smart_home_automation_2\smoke_best.pt")
 static_fire_directory = r"C:\Users\DEVANSH\Desktop\ANPR\FLOW YLO\smart_home_automation_2\static\fire"
 
 # Function to send fire status to the Flask server in a separate thread
-def send_fire_status_to_flask_server_async(status):
+def send_fire_status_to_flask_server_async(image_name):
     with api_lock:
+
+        print("fire was detected fire was sent to api (api should be called ) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+        print(image_name)
+
         url = f"{flask_server_endpoint}/update_fire_status"
-        payload = {"status": status}
+        payload = {"status": "fire detected"}
+
+        # Include additional data for notification in the payload
+        timestamp = datetime.datetime.utcnow().isoformat()
+
+        fire_data = {
+            "timestamp": timestamp,
+            "image_name": image_name,
+        }
+
+        payload = {
+            "Alert_type": "fire",
+            "status": "true",
+            "fire_data": fire_data,
+            "notification_data": {
+                'title': 'Fire Detected!',
+                'body': 'Possible Fire detected. Open the app to view details.',
+            }
+        }
+
         response = requests.post(url, json=payload)
         print("API Response:", response.text)
+        
 
 # Function to save image with bounding boxes
 def save_image_with_bounding_boxes(image, boxes, save_path):
@@ -266,11 +297,20 @@ def process_fire_detection(img):
 
     if fire_detected:
 
-        save_path = f"{static_fire_directory}/fire_detected_image_{time.time()}.jpg"
+        print("fire was detected by the model !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+        current_time = time.time()
+        save_path = f"{static_fire_directory}/fire_detected_image_{current_time}.jpg"
+        image_name = f"fire_detected_image_{current_time}.jpg"
+
+        print(image_name)
+
         save_image_with_bounding_boxes(img, fire_boxes, save_path)
 
+
+
         # Send fire status to the Flask server in a separate thread
-        threading.Thread(target=send_fire_status_to_flask_server_async, args=(fire_detected,)).start()
+        threading.Thread(target=send_fire_status_to_flask_server_async, args=(image_name,)).start()
 
     return fire_detected
 # //////////////////// Smoke setup END  //////////////////////
