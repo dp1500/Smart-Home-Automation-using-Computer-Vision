@@ -6,15 +6,16 @@ This project implements a smart home automation system that incorporates object 
 
 ## Features
 
-- **Object Detection**: Utilizes YOLO model to detect and classify objects, including persons and fires, in live video streams. The YOLO model is trained on a large dataset of images containing various objects and their classes. The detection algorithm processes live video frames captured from the camera and applies the YOLO model to identify objects within the frames. Bounding boxes are drawn around detected objects for visualization.
+- **Peron and Fire Detection**: Utilizes the YOLO model to detect and classify objects, including persons and fires, in live video streams. The detection algorithm processes live video frames captured from the camera and applies the YOLO model to identify objects within the frames. Bounding boxes are drawn around detected objects for visualization that can be streamed live to the user through a front-end application.
 
-- **Face Recognition**: Implements Facebook's Face Recognition API to identify intruders by comparing detected faces with known family member faces. The system maintains a database of known family member faces, and when a new face is detected in the video stream, it is compared against the database using the Face Recognition API. If a match is found, the person is identified as a family member; otherwise, they are classified as an intruder.
+- **Intruder Detection using Face Recognition**: Implements Facebook's Face Recognition API to identify intruders by comparing detected faces with known family member faces. The system maintains a database of known family member faces. When a new face is detected in the video stream, it is compared against the database using the Face Recognition API. If a match is found, the person is identified as a family member; otherwise, they are classified as an intruder.
 
-- **Real-time Alerts**: Sends notifications to users via a Flutter app when intruders or fires are detected. The Flask backend server communicates with the Flutter app via RESTful APIs. When an intruder or fire is detected, the server sends a push notification to the Flutter app using the Firebase Admin SDK. The app receives the notification and displays an alert to the user, providing real-time updates on potential security threats.
+- **Real-time Alerts**: Sends notifications to users via a Flutter app when intruders or fires are detected. The Flask backend server communicates with the Flutter app via RESTful APIs. When an intruder or fire is detected, the server sends a push notification to the Flutter app using the Firebase Admin SDK. The app receives the notification and displays an alert to the user along with frames(images) with detections, providing real-time updates on potential security threats.
+
+- - **Live Stream using WebSocket Server**: Streams live video feed from the camera to connected clients using WebSocket for real-time monitoring. The WebSocket server script establishes a bidirectional communication channel between the server and clients, allowing the server to push live video frames to connected clients in real time. Clients, such as the Flutter app or a web browser, receive the video feed and display it to the user for remote monitoring of the premises.
 
 - **Flask Backend**: Implements a Flask server to handle communication between the detection algorithms and the Flutter app. The Flask server exposes RESTful APIs that enable the detection scripts to update the position of detected objects, upload family member images for face recognition, and send notifications to the Flutter app. The server processes incoming requests, performs necessary operations, and returns appropriate responses to the clients.
-
-- **WebSocket Server**: Streams live video feed from the camera to connected clients using WebSocket for real-time monitoring. The WebSocket server script establishes a bidirectional communication channel between the server and clients, allowing the server to push live video frames to connected clients in real-time. Clients, such as the Flutter app or a web browser, receive the video feed and display it to the user for remote monitoring of the premises.
+- 
 
 ## Technologies Used
 
@@ -26,20 +27,13 @@ This project implements a smart home automation system that incorporates object 
 
 - **Flask**: Python-based micro web framework used to develop the backend server for handling API requests and communication with the Flutter app.
 
+- **REST API**: Implemented RESTful endpoints in the Flask backend to facilitate communication between the client (Flutter app) and server. The REST API handles various operations such as retrieving data, updating resources, and triggering actions.
+
 - **WebSocket**: A communication protocol that enables bidirectional communication between clients and servers over a single, long-lived connection.
 
 - **Firebase Admin SDK**: Integrated to send push notifications to the Flutter app when intruders or fires are detected.
 
-## Project Structure
-
-The project consists of three main components:
-
-1. **Object Detection and Face Recognition Script**: Implements the core functionality of the system. Utilizes YOLO model for object detection, Facebook's Face Recognition API for face recognition, and OpenCV for video stream processing.
-
-2. **Flask Server and APIs**: Provides a Flask-based backend server to handle communication between the detection script and the Flutter app. Includes APIs for updating the position of detected objects, uploading family member images, and sending notifications.
-
-3. **WebSocket Server Script**: Sets up a WebSocket server to stream live video feed from the camera to connected clients in real-time, facilitating remote monitoring.
-
+- **Multi-Threading**: Multithreading is employed within the Flask backend for multiple APIs to enhance server performance and responsiveness by creating and handling concurrent tasks efficiently.
 
 ## Contributors
 
@@ -47,6 +41,3 @@ The project consists of three main components:
 - [Contributor 1] - Backend Developer
 - [Contributor 2] - Frontend Developer
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
