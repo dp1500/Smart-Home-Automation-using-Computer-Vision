@@ -26,7 +26,7 @@ This project implements a smart home automation system that incorporates object 
 - **Live Stream using WebSocket Server**: Streams live video feed from the camera to connected clients using WebSocket for real-time monitoring. The WebSocket server script establishes a bidirectional communication channel between the server and clients, allowing the server to push live video frames to connected clients in real time. Clients, such as the Flutter app or a web browser, receive the video feed and display it to the user for remote monitoring of the premises.
 
 - **Flask Backend**: Implements a Flask server to handle communication between the detection algorithms and the Flutter app. The Flask server exposes RESTful APIs that enable the detection scripts to update the position of detected objects, upload family member images for face recognition, and send notifications to the Flutter app. The server processes incoming requests, performs necessary operations, and returns appropriate responses to the clients.
-- 
+  
 
 ## Technologies Used
 
