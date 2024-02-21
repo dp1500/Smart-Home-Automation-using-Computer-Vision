@@ -16,7 +16,7 @@ This project implements a smart home automation system that incorporates object 
   
 - **Intruder Detection using Face Recognition**: Implements Facebook's Face Recognition API to identify intruders by comparing detected faces with known family member faces. The system maintains a database of known family member faces. When a new face is detected in the video stream, it is compared against the database using the Face Recognition API. If a match is found, the person is identified as a family member; otherwise, they are classified as an intruder.
 <p align="center">
-  <img src="[https://github.com/dp1500/smart-home-automation-using-Computer-Vision-IoT/blob/main/fire_detected_image_1700288285.169754.jpg](https://github.com/dp1500/smart-home-automation-using-Computer-Vision-IoT/blob/main/detected_image_1700575868.317921.jpg)" alt="Result Table" width="500" height="281">
+  <img src="https://github.com/dp1500/smart-home-automation-using-Computer-Vision-IoT/blob/main/detected_image_1700575868.317921.jpg" alt="Result Table" width="500" height="281">
   <br>
   <em>Figure 2: Face recognition with red bounding box & Person detection with green bounding box</em>
 </p>
