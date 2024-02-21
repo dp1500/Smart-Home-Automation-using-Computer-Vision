@@ -40,19 +40,6 @@ The project consists of three main components:
 
 3. **WebSocket Server Script**: Sets up a WebSocket server to stream live video feed from the camera to connected clients in real-time, facilitating remote monitoring.
 
-## Usage
-
-1. **Clone Repository**: Clone the project repository to your local machine.
-
-2. **Install Dependencies**: Install the necessary Python dependencies using `pip install -r requirements.txt`.
-
-3. **Run Flask Server**: Execute the Flask server script to start the backend server for handling API requests.
-
-4. **Start WebSocket Server**: Run the WebSocket server script to initiate the live video feed streaming.
-
-5. **Run Object Detection Script**: Execute the object detection and face recognition script to begin detecting intruders and fires in the video feed.
-
-6. **View Alerts**: Receive real-time alerts and notifications on the Flutter app when intruders or fires are detected.
 
 ## Contributors
 
