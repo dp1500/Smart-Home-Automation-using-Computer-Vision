@@ -51,6 +51,6 @@ This project implements a smart home automation system that incorporates object 
 ## Contributors
 
 - Devansh Parmar [myself] - Model Deployment, Integration, and Backend Development 
-- https://github.com/Nitin-Singh18[contributor 1] - Flutter app Developer
-- https://github.com/Programmer9211[contributor 1] - Flutter app Developer
+- [contributor 1]https://github.com/Nitin-Singh18  - Flutter app Developer
+- [contributor 2]https://github.com/Programmer9211 - Flutter app Developer
 
