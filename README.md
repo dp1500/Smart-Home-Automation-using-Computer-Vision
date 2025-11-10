@@ -1,4 +1,4 @@
-# Smart Home Automation with Object Detection and Face Recognition
+# Smart Home Security with Object Detection and Face Recognition
 
 ## Overview
 
@@ -15,7 +15,11 @@ This project implements a smart home automation system that incorporates object 
 
   
 - **Intruder Detection using Face Recognition**: Implements Facebook's Face Recognition API to identify intruders by comparing detected faces with known family member faces. The system maintains a database of known family member faces. When a new face is detected in the video stream, it is compared against the database using the Face Recognition API. If a match is found, the person is identified as a family member; otherwise, they are classified as an intruder.
-
+  <p align="center">
+  <img src="https://github.com/dp1500/smart-home-automation-using-Computer-Vision-IoT/blob/main/detected_image_1700575868.317921.jpg" alt="Result Table" width="500" height="281">
+  <br>
+  <em>Figure 2: Face recognition with red bounding box & Person detection with green bounding box</em>
+</p>
 
 - **Real-time Alerts**: Sends notifications to users via a Flutter app when intruders or fires are detected. The Flask backend server communicates with the Flutter app via RESTful APIs. When an intruder or fire is detected, the server sends a push notification to the Flutter app using the Firebase Admin SDK. The app receives the notification and displays an alert to the user along with frames(images) with detections, providing real-time updates on potential security threats.
 
